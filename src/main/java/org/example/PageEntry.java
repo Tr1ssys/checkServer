@@ -1,3 +1,5 @@
+package org.example;
+
 public class PageEntry implements Comparable<PageEntry> {
     private final String pdfName;
     private final int page;
@@ -17,7 +19,7 @@ public class PageEntry implements Comparable<PageEntry> {
 
     @Override
     public String toString() {
-        return "PageEntry{" +
+        return "org.example.PageEntry{" +
                 "pdfName='" + pdfName + '\'' +
                 ", page=" + page +
                 ", count=" + count +

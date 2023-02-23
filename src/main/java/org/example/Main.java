@@ -1,41 +1,39 @@
+package org.example;
+
 import com.google.gson.Gson;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.charset.StandardCharsets;
+
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
 
 public class Main {
     public static void main(String[] args) throws Exception {
+
         BooleanSearchEngine engine = new BooleanSearchEngine(new File("pdfs"));
 
         try (ServerSocket serverSocket = new ServerSocket(ServerConfig.PORT)) { // стартуем сервер один(!) раз
             while (true) { // в цикле(!) принимаем подключения
-                try(
+                try (
                         Socket socket = serverSocket.accept();
                         BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                         PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-                        OutputStream outStream = socket.getOutputStream();
-                        )  {
-
+                ) {
                     System.out.println("подключились");
-                    //String word = in.readLine();
-//                    List<PageEntry> entries = engine.search(word);
-//                    String jsonEntries = new Gson().toJson(entries);
-//                    outStream.write("HTTP/1.1 200 OK\r\n".getBytes());
-//                    outStream.write("Main: OneServer 0.1\r\n".getBytes());
-//                    outStream.write("Content-length: 5\r\n".getBytes()); // if text/plain the length is required
-//                    outStream.write("Content-Type: text/plain\r\n".getBytes());
-//                    outStream.write("hello".getBytes());
-//                    outStream.flush();
-                    //String jsonEntries = "hello";
-                    //out.println(jsonEntries);
-                } catch (Exception ex){
+                    String word = in.readLine();
+                    String[] get = java.net.URLDecoder.decode(word, StandardCharsets.UTF_8).split(" ");
+
+                    List<PageEntry> entries = engine.search(get[1].replace("/", ""));
+                    String jsonEntries = new Gson().toJson(entries);
+                    out.print("HTTP/1.1 200 \r\n"); // Version & status code
+                    out.print("Content-Type: text/plain;charset=UTF-8\r\n"); // The type of data
+                    out.print("Connection: close\r\n"); // Will close stream
+                    out.print("\r\n"); // End of headers
+                    out.println(jsonEntries);
+                } catch (Exception ex) {
 
                 }
             }
